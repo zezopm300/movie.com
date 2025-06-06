@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>موفي - أفضل تجربة مشاهدة أفلام</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Cairo', sans-serif;
+    background-color: #141414;
+    color: #eee;
+    direction: rtl;
+  }
+
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background-color: #111;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    z-index: 1000;
+    transition: background-color 0.3s ease, height 0.3s ease;
+  }
+
+  header.scrolled {
+    height: 50px;
+    background-color: rgba(17, 17, 17, 0.9);
+  }
+
+  #logo {
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: #e50914;
+    cursor: pointer;
+    letter-spacing: 3px;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-links li {
+    margin: 0 15px;
+  }
+
+  .nav-links a {
+    color: #eee;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a:hover, .nav-links a.active {
+    color: #e50914;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  #searchInput {
+    width: 280px;
+    height: 38px;
+    border-radius: 20px;
+    border: none;
+    padding: 0 15px;
+    font-size: 1rem;
+    background-color: #222;
+    color: #fff;
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+
+  #searchInput::placeholder {
+    color: #999;
+  }
+
+  #searchInput:focus {
+    background-color: #333;
+    outline: none;
+    width: 320px;
+  }
+
+  .search-icon, .user-icon {
+    color: #eee;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+
+  .search-icon:hover, .user-icon:hover {
+    color: #e50914;
+  }
+
+  .hamburger-menu {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+  }
+
+  .hamburger-menu div {
+    width: 25px;
+    height: 3px;
+    background-color: #eee;
+    margin: 4px 0;
+    transition: all 0.3s ease;
+  }
+
+  .nav-links-mobile {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background-color: #111;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    z-index: 999;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .nav-links-mobile.active {
+    transform: translateY(0);
+  }
+
+  .nav-links-mobile li {
+    margin: 15px 0;
+  }
+
+  .nav-links-mobile a {
+    color: #eee;
+    text-decoration: none;
+    font-size: 1.3rem;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links-mobile a:hover {
+    color: #e50914;
+  }
+
+  main {
+    margin-top: 80px;
+    padding: 20px 40px 50px;
+  }
+
+  h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+    gap: 18px;
+  }
+
+  .movie-card {
+    background-color: #222;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .movie-card:hover {
+    transform: scale(1.06);
+    box-shadow: 0 8px 25px #e50914cc;
+  }
+
+  .movie-card img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    transition: filter 0.3s ease;
+  }
+
+  .movie-card:hover img {
+    filter: brightness(0.75);
+  }
+
+  .movie-info {
+    padding: 12px 15px;
+    text-align: center;
+  }
+
+  .movie-title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+  }
+
+  .movie-meta {
+    font-size: 0.9rem;
+    color: #bbb;
+  }
+
+  #movieModal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 30px;
+  }
+
+  #movieModal.active {
+    display: flex;
+  }
+
+  #movieModal .modal-content {
+    background-color: #222;
+    border-radius: 14px;
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    gap: 20px;
+    position: relative;
+    flex-wrap: wrap;
+    padding: 30px;
+  }
+
+  #movieModal .modal-poster {
+    flex: 1 1 320px;
+    max-width: 320px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  #movieModal .modal-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  #movieModal .modal-details {
+    flex: 2 1 500px;
+    display: flex;
+    flex-direction: column;
+    color: #eee;
+  }
+
+  #movieModal .modal-details h1 {
+    margin: 0 0 12px;
+    font-size: 2.8rem;
+  }
+
+  #movieModal .modal-meta {
+    font-size: 1rem;
+    color: #bbb;
+    margin-bottom: 18px;
+  }
+
+  #movieModal .modal-description {
+    flex-grow: 1;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+  }
+
+  #movieModal video {
+    width: 100%;
+    max-height: 360px;
+    border-radius: 12px;
+    background-color: black;
+  }
+
+  #movieModal .close-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: #e50914;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.3s ease;
+  }
+
+  #movieModal .close-btn:hover {
+    color: #ff3b3b;
+  }
+
+  @media (max-width: 900px) {
+    .nav-links {
+      display: none;
+    }
+    .hamburger-menu {
+      display: flex;
+    }
+    header {
+      padding: 0 20px;
+    }
+    #searchInput {
+      width: 180px;
+    }
+  }
+
+  @media (max-width: 800px) {
+    #movieModal .modal-content {
+      flex-direction: column;
+      max-height: 85vh;
+      padding: 20px;
+    }
+    #movieModal .modal-poster,
+    #movieModal .modal-details {
+      max-width: 100%;
+      flex: unset;
+    }
+    #movieModal video {
+      max-height: 250px;
+    }
+    .movie-card img {
+      height: 180px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    header #searchInput {
+      width: 140px;
+    }
+    #movieModal .modal-details h1 {
+      font-size: 2rem;
+    }
+    main {
+      padding: 15px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#" id="logo">موفي</a>
+  <ul class="nav-links">
+    <li><a href="#" class="active">الرئيسية</a></li>
+    <li><a href="#">مسلسلات</a></li>
+    <li><a href="#">أفلام</a></li>
+    <li><a href="#">مضاف حديثًا</a></li>
+    <li><a href="#">قائمتي</a></li>
+  </ul>
+  <div class="nav-right">
+    <input type="search" id="searchInput" placeholder="ابحث عن فيلم أو مسلسل..." />
+    <i class="fas fa-search search-icon"></i>
+    <i class="fas fa-user user-icon"></i>
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+</header>
+
+<ul class="nav-links-mobile" id="navLinksMobile">
+  <li><a href="#">الرئيسية</a></li>
+  <li><a href="#">مسلسلات</a></li>
+  <li><a href="#">أفلام</a></li>
+  <li><a href="#">مضاف حديثًا</a></li>
+  <li><a href="#">قائمتي</a></li>
+</ul>
+
+<main>
+  <h2>الأفلام المميزة</h2>
+  <div class="movies-grid" id="moviesGrid"></div>
+</main>
+
+<div id="movieModal">
+  <div class="modal-content">
+    <div class="close-btn" id="modalClose">&times;</div>
+    <div class="modal-poster">
+      <img src="" alt="بوستر الفيلم" id="modalPoster" />
+    </div>
+    <div class="modal-details">
+      <h1 id="modalTitle">عنوان الفيلم</h1>
+      <div class="modal-meta" id="modalMeta">السنة • التصنيف • المدة</div>
+      <div class="modal-description" id="modalDescription">وصف الفيلم</div>
+      <video id="modalVideo" controls preload="metadata" poster="" >
+        <source src="" type="video/mp4" />
+        متصفحك لا يدعم تشغيل الفيديو.
+      </video>
+    </div>
+  </div>
+</div>
+
+<script>
+  // بيانات الأفلام: عنوان، سنة، تصنيف، مدة، وصف، بوستر، فيديو
+  const movies = [
+    {
+      title: "إنترستلر",
+      year: 2014,
+      rating: "PG-13",
+      duration: "2س 49د",
+      description: "رحلة ملحمية عبر الفضاء لإنقاذ البشرية من خطر الانقراض.",
+      poster: "https://m.media-amazon.com/images/I/71n58lzZX5L._AC_SY679_.jpg",
+      video: "https://cdn.coverr.co/videos/coverr-the-journey-of-life-1234/1080p.mp4"
+    },
+    {
+      title: "العراب",
+      year: 1972,
+      rating: "R",
+      duration: "2س 55د",
+      description: "ملحمة عائلية عن الجريمة والسلطة في عالم المافيا.",
+      poster: "https://upload.wikimedia.org/wikipedia/ar/1/1c/The_Godfather_1972_film_poster.jpg",
+      video: "https://cdn.coverr.co/videos/coverr-silhouetted-couple-on-bridge-1215/1080p.mp4"
+    },
+    {
+      title: "سريع وغاضب 7",
+      year: 2015,
+      rating: "PG-13",
+      duration: "2س 17د",
+      description: "أكشن ومطاردات سيارات بأعلى مستوى مع فريق فين ديزل.",
+      poster: "https://upload.wikimedia.org/wikipedia/ar/a/a2/Furious_7_poster.jpg",
+      video: "https://cdn.coverr.co/videos/coverr-driving-fast-on-a-highway-1245/1080p.mp4"
+    },
+    {
+      title: "حكاية لعبة",
+      year: 1995,
+      rating: "G",
+      duration: "1س 21د",
+      description: "قصة ألعاب تتحرك بالحياة في مغامرة مليئة بالمرح والعواطف.",
+      poster: "https://upload.wikimedia.org/wikipedia/en/1/13/Toy_Story.jpg",
+      video: "https://cdn.coverr.co/videos/coverr-walking-in-woods-1295/1080p.mp4"
+    }
+  ];
+
+  const moviesGrid = document.getElementById('moviesGrid');
+  const modal = document.getElementById('movieModal');
+  const modalPoster = document.getElementById('modalPoster');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalMeta = document.getElementById('modalMeta');
+  const modalDescription = document.getElementById('modalDescription');
+  const modalVideo = document.getElementById('modalVideo');
+  const modalClose = document.getElementById('modalClose');
+
+  function createMovieCard(movie, index) {
+    const card = document.createElement('div');
+    card.classList.add('movie-card');
+    card.dataset.index = index;
+    card.innerHTML = `
+      <img src="${movie.poster}" alt="بوستر ${movie.title}" />
+      <div class="movie-info">
+        <div class="movie-title">${movie.title}</div>
+        <div class="movie-meta">${movie.year} • ${movie.rating}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => openModal(index));
+    return card;
+  }
+
+  function openModal(index) {
+    const movie = movies[index];
+    modalPoster.src = movie.poster;
+    modalPoster.alt = `بوستر ${movie.title}`;
+    modalTitle.textContent = movie.title;
+    modalMeta.textContent = `${movie.year} • ${movie.rating} • ${movie.duration}`;
+    modalDescription.textContent = movie.description;
+    modalVideo.pause();
+    modalVideo.currentTime = 0;
+    modalVideo.poster = movie.poster;
+    modalVideo.querySelector('source').src = movie.video;
+    modalVideo.load();
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // منع التمرير بالخلفية
+  }
+
+  function closeModal() {
+    modal.classList.remove('active');
+    modalVideo.pause();
+    document.body.style.overflow = ''; // السماح بالتمرير مجدداً
+  }
+
+  modalClose.addEventListener('click', closeModal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  // تفعيل القائمة المتحركة على الموبايل
+  const hamburgerMenu = document.getElementById('hamburgerMenu');
+  const navLinksMobile = document.getElementById('navLinksMobile');
+
+  hamburgerMenu.addEventListener('click', () => {
+    navLinksMobile.classList.toggle('active');
+  });
+
+  // توليد البطاقات وعرضها
+  function displayMovies() {
+    moviesGrid.innerHTML = '';
+    movies.forEach((movie, i) => {
+      moviesGrid.appendChild(createMovieCard(movie, i));
+    });
+  }
+
+  displayMovies();
+
+  // إضافة تأثير تغيير الهيدر عند التمرير
+  window.addEventListener('scroll', () => {
+    const header = document.querySelector('header');
+    if(window.scrollY > 40){
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+</script>
+
+</body>
+</html>
